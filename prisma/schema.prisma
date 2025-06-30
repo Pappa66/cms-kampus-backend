@@ -19,56 +19,15 @@ enum PublishStatus {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String
-  role      UserRole @default(MAHASISWA)
-  posts     Post[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Post {
-  id        String  @id @default(cuid())
-  title     String
-  content   String  @db.Text
-  imageUrl  String?
-  
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  String
-  
-  menuItem    MenuItem?
-  submenuItem SubMenuItem?
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model MenuItem {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  href      String?
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  
-  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String?  @unique
-  
-  submenus  SubMenuItem[]
-}
-
-model SubMenuItem {
-  id         String   @id @default(cuid())
-  name       String
-  href       String?
-  order      Int      @default(0)
-  
-  post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId     String?  @unique
-
-  menuItemId String
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  id            String            @id @default(cuid())
+  email         String            @unique
+  name          String
+  password      String
+  role          UserRole          @default(MAHASISWA)
+  posts         Post[]
+  uploadedItems RepositoryItem[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 }
 
 model RepositoryItem {
@@ -82,6 +41,8 @@ model RepositoryItem {
   advisor      String?
   status       PublishStatus @default(PRIVATE)
   publishedAt  DateTime?
+  uploader     User          @relation(fields: [uploaderId], references: [id])
+  uploaderId   String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   files        FileItem[]
@@ -94,4 +55,39 @@ model FileItem {
   fileUrl          String
   repositoryItemId String
   repositoryItem   RepositoryItem @relation(fields: [repositoryItemId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id        String  @id @default(cuid())
+  title     String
+  content   String  @db.Text
+  imageUrl  String?
+  author    User    @relation(fields: [authorId], references: [id])
+  authorId  String
+  menuItem    MenuItem?
+  submenuItem SubMenuItem?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MenuItem {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  href      String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String?  @unique
+  submenus  SubMenuItem[]
+}
+
+model SubMenuItem {
+  id         String   @id @default(cuid())
+  name       String
+  href       String?
+  order      Int      @default(0)
+  post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId     String?  @unique
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
 }
