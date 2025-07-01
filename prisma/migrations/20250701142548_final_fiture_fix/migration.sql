@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "MenuType" ADD VALUE 'STATIC_PATH';

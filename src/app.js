@@ -17,12 +17,17 @@ const advisorRoutes = require('./routes/advisorRoutes');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(cors({
+  origin: '*', // Izinkan semua origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Izinkan semua method
+  allowedHeaders: ['Content-Type', 'Authorization'], // Izinkan header ini
+}));
 
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
-app.use(limiter);
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+//const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
+//app.use(limiter);
 
 // Gunakan semua route
 app.use('/api/menu-items', menuRoutes);
@@ -33,6 +38,7 @@ app.use('/api/repository-items', repositoryRoutes);
 app.use('/api/my-repository', myRepositoryRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/advisor', advisorRoutes);
+app.use('/api/upload', require('./routes/uploadRoutes'));
 
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);

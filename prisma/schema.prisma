@@ -18,6 +18,12 @@ enum PublishStatus {
   PRIVATE
 }
 
+enum MenuType {
+  INTERNAL
+  EXTERNAL
+  STATIC_PATH
+}
+
 model User {
   id            String            @id @default(cuid())
   email         String            @unique
@@ -58,35 +64,37 @@ model FileItem {
 }
 
 model Post {
-  id        String  @id @default(cuid())
-  title     String
-  content   String  @db.Text
-  imageUrl  String?
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  String
+  id          String       @id @default(cuid())
+  title       String
+  content     String       @db.Text
+  imageUrl    String?
+  author      User         @relation(fields: [authorId], references: [id])
+  authorId    String
   menuItem    MenuItem?
   submenuItem SubMenuItem?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model MenuItem {
-  id        String   @id @default(cuid())
-  name      String   @unique
+  id        String        @id @default(cuid())
+  name      String        @unique
+  order     Int           @default(0)
+  createdAt DateTime      @default(now())
+  type      MenuType      @default(INTERNAL)
   href      String?
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String?  @unique
+  post      Post?         @relation(fields: [postId], references: [id], onDelete: SetNull)
+  postId    String?       @unique
   submenus  SubMenuItem[]
 }
 
 model SubMenuItem {
   id         String   @id @default(cuid())
   name       String
-  href       String?
   order      Int      @default(0)
-  post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type       MenuType @default(INTERNAL)
+  href       String?
+  post       Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
   postId     String?  @unique
   menuItemId String
   menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)

@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { getPostById, updatePost } = require('../controllers/postController');
+const { getPosts, getPostById, updatePost, deletePost } = require('../controllers/postController');
 const { protect, isAdmin } = require('../middleware/authMiddleware');
 
-// Hanya admin yang bisa get by id (untuk editor) dan update
+router.route('/')
+    .get(getPosts); // getPosts tidak perlu proteksi jika ingin bisa diakses publik
+
 router.route('/:id')
-    .get(protect, isAdmin, getPostById)
-    .put(protect, isAdmin, updatePost);
+    .get(getPostById) // getPostById juga tidak perlu proteksi untuk halaman publik
+    .put(protect, isAdmin, updatePost)
+    .delete(protect, isAdmin, deletePost);
 
 module.exports = router;

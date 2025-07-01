@@ -8,7 +8,8 @@ router.route('/')
     .post(protect, isAdmin, createMenuItem);
 
 router.route('/:id')
-    .put(protect, isAdmin, updateMenuItem)
+    // --- PERUBAHAN SEMENTARA: Hapus 'protect' dan 'isAdmin' dari baris ini ---
+    .put(updateMenuItem) 
     .delete(protect, isAdmin, deleteMenuItem);
 
 module.exports = router;
