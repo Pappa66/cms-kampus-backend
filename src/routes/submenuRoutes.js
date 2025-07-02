@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { createSubMenuItem, deleteSubMenuItem } = require('../controllers/submenuController');
+// Tambahkan reorderSubMenuItems ke dalam import
+const { createSubMenuItem, deleteSubMenuItem, reorderSubMenuItems } = require('../controllers/submenuController');
 const { protect, isAdmin } = require('../middleware/authMiddleware');
+
+// Route baru untuk reorder
+router.route('/reorder')
+    .put(protect, isAdmin, reorderSubMenuItems);
 
 router.route('/')
     .post(protect, isAdmin, createSubMenuItem);

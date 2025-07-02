@@ -44,10 +44,6 @@ const createMenuItem = async (req, res) => {
 };
 
 const updateMenuItem = async (req, res) => {
-    // --- MULAI BAGIAN TES ---
-
-    // Semua logika di bawah ini kita nonaktifkan sementara
-    /*
     const { id } = req.params;
     const { name, type, href } = req.body;
     try {
@@ -66,13 +62,11 @@ const updateMenuItem = async (req, res) => {
         console.error("ERROR UPDATE MENU:", error);
         res.status(400).json({ message: 'Gagal memperbarui menu' });
     }
-    */
+
 
     // Kirim respons sukses palsu untuk melihat apakah frontend menerimanya
     console.log("Simulasi update menu berhasil dijalankan.");
     res.status(200).json({ message: 'Update disimulasikan berhasil' });
-
-    // --- AKHIR BAGIAN TES ---
 };
 
 const deleteMenuItem = async (req, res) => {
@@ -83,4 +77,29 @@ const deleteMenuItem = async (req, res) => {
     } catch (error) { res.status(400).json({ message: 'Gagal menghapus menu' }); }
 };
 
-module.exports = { getMenuItems, createMenuItem, updateMenuItem, deleteMenuItem };
+const reorderMenuItems = async (req, res) => {
+    const { items } = req.body; // Menerima array of { id, order }
+
+    if (!items || !Array.isArray(items)) {
+        return res.status(400).json({ message: 'Data urutan tidak valid.' });
+    }
+
+    try {
+        // Gunakan transaksi untuk memastikan semua update berhasil atau semua gagal
+        await prisma.$transaction(
+            items.map(item => 
+                prisma.menuItem.update({
+                    where: { id: item.id },
+                    data: { order: item.order },
+                })
+            )
+        );
+        res.status(200).json({ message: 'Urutan menu berhasil diperbarui.' });
+    } catch (error) {
+        console.error("Error saat mengurutkan menu:", error);
+        res.status(500).json({ message: 'Gagal menyimpan urutan menu.' });
+    }
+};
+
+// Jangan lupa ekspor fungsi baru
+module.exports = { getMenuItems, createMenuItem, updateMenuItem, deleteMenuItem, reorderMenuItems };

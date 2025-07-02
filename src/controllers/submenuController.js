@@ -53,4 +53,28 @@ const deleteSubMenuItem = async (req, res) => {
     }
 };
 
-module.exports = { createSubMenuItem, deleteSubMenuItem };
+const reorderSubMenuItems = async (req, res) => {
+    const { items } = req.body; // Menerima array of { id, order }
+
+    if (!items || !Array.isArray(items)) {
+        return res.status(400).json({ message: 'Data urutan tidak valid.' });
+    }
+
+    try {
+        await prisma.$transaction(
+            items.map(item => 
+                prisma.subMenuItem.update({
+                    where: { id: item.id },
+                    data: { order: item.order },
+                })
+            )
+        );
+        res.status(200).json({ message: 'Urutan submenu berhasil diperbarui.' });
+    } catch (error) {
+        console.error("Error saat mengurutkan submenu:", error);
+        res.status(500).json({ message: 'Gagal menyimpan urutan submenu.' });
+    }
+};
+
+// Jangan lupa ekspor fungsi baru
+module.exports = { createSubMenuItem, deleteSubMenuItem, reorderSubMenuItems };
